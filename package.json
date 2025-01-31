@@ -1,0 +1,25 @@
+{
+  "name": "sparse-file-creator",
+  "version": "1.0.0",
+  "description": "A small tool for creating random sparse file, written in Node.js ",
+  "keywords": [
+    "node",
+    "nodejs",
+    "sparse-file"
+  ],
+  "homepage": "https://github.com/lv3-himeme/sparse-file-creator#readme",
+  "bugs": {
+    "url": "https://github.com/lv3-himeme/sparse-file-creator/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lv3-himeme/sparse-file-creator.git"
+  },
+  "license": "MIT",
+  "author": "lv3-himeme",
+  "type": "commonjs",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
