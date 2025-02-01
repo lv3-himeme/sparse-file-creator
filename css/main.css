@@ -1,0 +1,33 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: auto;
+    max-width: 1080px;
+    padding: 10px;
+}
+
+h1, h2, h3, h4 {
+    font-weight: bold;
+}
+
+.title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 22pt;
+}
+
+.grid {
+    display: grid;
+    column-gap: 10px;
+}
+
+.grid.pc80 {
+    grid-template-columns: 4fr 1fr;
+}
+
+.grid.pc50 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.grid.pc33 {
+    grid-template-columns: 1fr 1fr 1fr;
+}

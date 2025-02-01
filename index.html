@@ -1,0 +1,89 @@
+<html data-bs-theme="dark">
+    <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <title>Sparse File Creator</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+    <body>
+        <p class="title">Sparse File Creator</p>
+        <hr>
+        <h4>Choose Output Folder</h4>
+        <div class="grid pc80">
+            <input type="text" id="folderLocation" class="form-control">
+            <button type="button" class="btn btn-secondary" onclick="chooseFolder()">Choose...</button>
+        </div>
+        <hr>
+        <div class="grid pc33" style="margin-bottom: 16px">
+            <div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="fileNameRadio" id="fileNameRadio1" checked>
+                    <label class="form-check-label" for="fileNameRadio1">File Name:</label>
+                </div>
+                <div style="margin-top: 10px">
+                    <input class="form-control" id="fileName">
+                </div>
+            </div>
+            <div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="fileNameRadio" id="fileNameRadio2">
+                    <label class="form-check-label" for="fileNameRadio2">Random Name:</label>
+                </div>
+                <div style="margin-top: 10px">
+                    <input class="form-control" type="number" id="fileNameCharLength" placeholder="Character Length" min="1" max="100">
+                </div>
+            </div>
+            <div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="fileNameRadio" id="fileNameRadio3">
+                    <label class="form-check-label" for="fileNameRadio3">Script:</label>
+                </div>
+                <div style="margin-top: 10px">
+                    <button type="button" class="btn btn-secondary" onclick="fileNameScript()" style="width: 100%">Define...</button>
+                </div>
+            </div>
+        </div>
+        <p>
+            <input type="text" class="form-control" placeholder="Extension" id="fileExtension">
+        </p>
+        <div class="grid pc33" style="margin-bottom: 16px">
+            <div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="fileSizeRadio" id="fileSizeRadio1" checked>
+                    <label class="form-check-label" for="fileSizeRadio1">Fixed Size (bytes):</label>
+                </div>
+                <div style="margin-top: 10px">
+                    <input class="form-control" id="fileSize" type="number" min="1">
+                </div>
+            </div>
+            <div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="fileSizeRadio" id="fileSizeRadio2">
+                    <label class="form-check-label" for="fileSizeRadio2">Random Size (bytes):</label>
+                </div>
+                <div style="margin-top: 10px" class="grid pc50">
+                    <input class="form-control" id="fileSizeMin" type="number" min="1" placeholder="Min">
+                    <input class="form-control" id="fileSizeMax" type="number" min="1" placeholder="Max">
+                </div>
+            </div>
+            <div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="fileSizeRadio" id="fileSizeRadio3">
+                    <label class="form-check-label" for="fileSizeRadio3">Script:</label>
+                </div>
+                <div style="margin-top: 10px">
+                    <button type="button" class="btn btn-secondary" onclick="fileSizeScript()" style="width: 100%">Define...</button>
+                </div>
+            </div>
+        </div>
+        <p>
+            <input type="number" class="form-control" placeholder="Number of files" id="fileQuantity" min="1">
+        </p>
+        <p><button type="button" class="btn btn-secondary" onclick="begin()" style="width: 100%">Begin</button></p>
+        <div class="progress" style="height: 36px">
+          <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progress"></div>
+        </div>
+        <script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+    </body>
+</html>

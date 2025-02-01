@@ -21,5 +21,13 @@
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "window": {
+    "fullscreen": false,
+    "position": "center",
+    "resizeable": true,
+    "show": true,
+    "width": 800,
+    "height": 600
   }
 }
