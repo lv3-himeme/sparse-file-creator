@@ -43,8 +43,12 @@ function codeEditorModal(type = "Name") {
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
     `;
     modal.show();
-    if (!fnScript) $("#code").val(`function define${type}(index) {\n\treturn index;\n}`);
-    else $("#code").val(fnScript);
+    var def = {
+        Name: fnScript,
+        Size: fsScript
+    }
+    if (!def[type]) $("#code").val(`function define${type}(index) {\n\treturn index;\n}`);
+    else $("#code").val(def[type]);
     modal.editor = codeEditor(document.getElementById("code"));
     setTimeout(() => modal.editor.refresh(), 500);
 }
@@ -113,10 +117,10 @@ function begin() {
             if (!fs.existsSync(folder) && confirm(`${folder} does not exist. Create it?`)) fs.mkdirSync(folder, {recursive: true});
             for (var i = 0; i < quantity; i++) {
                 $("#progress").css("width", `${i / quantity * 100}%`);
-                var names = [$("#fileName").val(), randomString(Number($("#fileNameCharLength").val())), (function() {
+                var names = [`${$("#fileName").val()}${(i > 0) ? (i + 1).toString() : ""}`, randomString(Number($("#fileNameCharLength").val())), (function() {
                     if (!fnScript) return null;
                     eval(fnScript);
-                    return defineName();
+                    return defineName(i);
                 })()],
                     fileName = names[fileNameType - 1];
                 if (!fileName) return alert("Please specify a file name.");
@@ -126,7 +130,7 @@ function begin() {
                 })(), (function() {
                     if (!fsScript) return null;
                     eval(fsScript);
-                    return defineSize();
+                    return defineSize(i);
                 })()],
                     fileSize = sizes[fileSizeType - 1];
                 if (!fileSize) return alert("Please specify a file size.");
