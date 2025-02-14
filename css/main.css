@@ -31,3 +31,16 @@ h1, h2, h3, h4 {
 .grid.pc33 {
     grid-template-columns: 1fr 1fr 1fr;
 }
+
+.grid.script {
+    row-gap: 10px;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 9fr;
+    width: 100%;
+    height: 100%;
+}
+
+.CodeMirror {
+    height: 100%;
+    width: 100%;
+}
