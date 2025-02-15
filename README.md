@@ -17,17 +17,15 @@ As soon as your operating system supports NW.js and your disk's filesystem suppo
 * **Arch Linux** with ext4 and NTFS filesystem
 * **macOS** with APFS filesystem
 
-## Installation
-
-### Prebuilt binaries
+## Prebuilt binaries
 
 [This is your destination](../../releases). Just download the binary made for your current operating system.
 
-### "Building" from source
+## "Building" from source
 
 Since this application uses NW.js, the building process is very easy to perform:
 
-#### Windows
+### Windows
 
 NW.js 0.72.0 is recommended because of it being the latest version supporting Windows 7 and 8.1. If you're using Windows 10, you can indeed download the latest version instead of older ones.
 
@@ -73,7 +71,7 @@ Rename-Item -Path ".\nwjs-v0.72.0-win-x64\nw.exe" -NewName "sparse-file-creator.
 
 Now you can run `sparse-file-creator.exe` (or `nw.exe` if you don't rename it) in `nwjs-v0.72.0-win-x64` folder. Of course you can rename or compress the folder if you want.
 
-#### macOS
+### macOS
 
 NW.js 0.72.0 is also recommended for this OS to bring back macOS 10.15 support. Of course you can still download the latest version if you don't care.
 
@@ -121,7 +119,7 @@ mv nwjs-v0.72.0-osx-x64/nwjs.app nwjs-v0.72.0-osx-x64/sparse-file-creator.app
 
 Now you can run `sparse-file-creator.app` (or `nwjs.app` if you don't rename it) in `nwjs-v0.72.0-osx-x64` folder, and of course you can rename or compress it if you want.
 
-#### Linux
+### Linux
 
 Replace `nwjs-v0.95.0-linux-x64` in every command with `nwjs-v0.95.0-linux-ia32` if you're building the 32-bit version.
 
