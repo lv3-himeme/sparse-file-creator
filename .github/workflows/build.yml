@@ -11,21 +11,7 @@ env:
   RELEASE_VERSION: "${{github.ref_name}}"
 
 jobs:
-  create-release:
-    name: Create a new release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Creating the release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "$RELEASE_VERSION" \
-          --repo="$GITHUB_REPOSITORY" \
-          --title="$RELEASE_VERSION" \
-          --latest --generate-notes
-
   build-windows:
-    needs: create-release
     name: Windows
     runs-on: windows-latest
     steps:
@@ -85,7 +71,6 @@ jobs:
           Remove-Item -Path "..\sparse-file-creator-win-x64.zip" -Force -Confirm:$false
 
   build-macos:
-    needs: create-release
     name: macOS
     runs-on: macos-latest
     steps:
@@ -147,7 +132,6 @@ jobs:
           rm ../sparse-file-creator-osx-arm64.zip
 
   build-linux:
-    needs: create-release
     name: Linux
     runs-on: ubuntu-latest
     steps:
