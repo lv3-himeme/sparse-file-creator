@@ -19,8 +19,8 @@ jobs:
       - name: Creating the release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: "$RELEASE_VERSION"
         run: |
+          echo "RELEASE_VERSION=$(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
           gh release create "$RELEASE_VERSION" \
           --repo="$GITHUB_REPOSITORY" \
           --title="$RELEASE_VERSION" \
