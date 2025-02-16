@@ -22,7 +22,7 @@ jobs:
           gh release create "$RELEASE_VERSION" \
           --repo="$GITHUB_REPOSITORY" \
           --title="$RELEASE_VERSION" \
-          --latest --generate_notes
+          --latest --generate-notes
 
   build-windows:
     needs: create-release
