@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 env:
-  RELEASE_VERSION: "${{github.event_name == 'pull_request' && format('PR{0}', github.event.number) || github.sha.substr(0, 7)}}"
+  RELEASE_VERSION: "${{github.event_name == 'pull_request' && format('PR{0}', github.event.number) || github.sha}}"
 
 jobs:
   create-release:
