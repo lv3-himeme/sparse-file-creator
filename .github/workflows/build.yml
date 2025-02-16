@@ -2,26 +2,19 @@ name: Build binaries
 
 on:
   push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+    tags:
+      - v*
 permissions:
   contents: write
 
 env:
-  RELEASE_VERSION: "${{github.event_name == 'pull_request' && format('PR{0}', github.event.number) || github.sha}}"
+  RELEASE_VERSION: "${{github.ref_name}}"
 
 jobs:
   create-release:
     name: Create a new release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set RELEASE_VERSION
-        run: echo "RELEASE_VERSION=rel-${GITHUB_SHA::7}" >> $GITHUB_ENV
-
       - name: Creating the release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -78,7 +71,6 @@ jobs:
       - name: Upload the binaries
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: "$RELEASE_VERSION"
         run: |
           gh release upload "$RELEASE_VERSION" --repo="$GITHUB_REPOSITORY" "..\sparse-file-creator-win-ia32.zip" "..\sparse-file-creator-win-x64.zip"
 
