@@ -1,0 +1,210 @@
+name: Buildbinaries
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+env:
+  RELEASE_VERSION: "${{github.event_name == 'pull_request' && format('PR{0}', github.event.number) || github.ref_name}}"
+
+jobs:
+  create-release:
+    name: Create a new release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Creating the release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: "$RELEASE_VERSION"
+        run: |
+          gh release create "$RELEASE_VERSION" \
+          --repo="$GITHUB_REPOSITORY" \
+          --title="$RELEASE_VERSION" \
+          --latest --generate_notes
+
+  build-windows:
+    needs: create-release
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Download NW.js binaries
+        shell: powershell
+        run: |
+          wget -O ..\nwjs-ia32.zip https://dl.nwjs.io/v0.72.0/nwjs-v0.72.0-win-ia32.zip
+          wget -O ..\nwjs-x64.zip https://dl.nwjs.io/v0.72.0/nwjs-v0.72.0-win-x64.zip
+
+      - name: Extract downloaded archives
+        shell: powershell
+        run: |
+          Expand-Archive -Path ..\nwjs-ia32.zip -DestinationPath ..
+          Expand-Archive -Path ..\nwjs-x64.zip -DestinationPath ..
+
+      - name: Copy the source code into the NW.js folder
+        shell: powershell
+        run: |
+          Copy-Item -Path ".\*" -Destination "..\nwjs-v0.72.0-win-ia32" -Recurse -Exclude ".git*"
+          Copy-Item -Path ".\*" -Destination "..\nwjs-v0.72.0-win-x64" -Recurse -Exclude ".git*"
+
+      - name: Rename nw.exe to sparse-file-creator.exe
+        shell: powershell
+        run: |
+          Rename-Item -Path "..\nwjs-v0.72.0-win-ia32\nw.exe" -NewName "sparse-file-creator.exe"
+          Rename-Item -Path "..\nwjs-v0.72.0-win-x64\nw.exe" -NewName "sparse-file-creator.exe"
+
+      - name: Rename folders
+        shell: powershell
+        run: |
+          Rename-Item -Path "..\nwjs-v0.72.0-win-ia32" -NewName "sparse-file-creator-win-ia32"
+          Rename-Item -Path "..\nwjs-v0.72.0-win-x64" -NewName "sparse-file-creator-win-x64"
+            
+      - name: Compress folder to .zip files
+        shell: powershell
+        run: |
+          Compress-Archive -Path "..\sparse-file-creator-win-ia32" -DestinationPath "..\sparse-file-creator-win-ia32.zip" -Force
+          Compress-Archive -Path "..\sparse-file-creator-win-x64" -DestinationPath "..\sparse-file-creator-win-x64.zip" -Force
+
+      - name: Upload the binaries
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: "$RELEASE_VERSION"
+        run: |
+          gh release upload "$RELEASE_VERSION" --repo="$GITHUB_REPOSITORY" "..\sparse-file-creator-win-ia32.zip" "..\sparse-file-creator-win-x64.zip"
+
+      - name: Cleaning up
+        shell: powershell
+        run: |
+          Remove-Item -Path "..\nwjs-ia32" -Force -Confirm:$false
+          Remove-Item -Path "..\nwjs-x64" -Force -Confirm:$false
+          Remove-Item -Path "..\sparse-file-creator-win-ia32" -Force -Confirm:$false
+          Remove-Item -Path "..\sparse-file-creator-win-x64" -Force -Confirm:$false
+          Remove-Item -Path "..\sparse-file-creator-win-ia32.zip" -Force -Confirm:$false
+          Remove-Item -Path "..\sparse-file-creator-win-x64.zip" -Force -Confirm:$false
+
+  build-macos:
+    needs: create-release
+    name: macOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Download NW.js binaries
+        run: |
+          wget -O ../nwjs-x64.zip https://dl.nwjs.io/v0.72.0/nwjs-v0.72.0-osx-x64.zip
+          wget -O ../nwjs-arm64.zip https://dl.nwjs.io/v0.95.0/nwjs-v0.95.0-osx-arm64.zip
+
+      - name: Extract downloaded archives
+        run: |
+          unzip -o ../nwjs-x64.zip -d ..
+          unzip -o ../nwjs-arm64.zip -d ..
+
+      - name: Create app.nw folder
+        run: |
+          mkdir -p ../nwjs-v0.72.0-osx-x64/nwjs.app/Contents/Resources/app.nw
+          mkdir -p ../nwjs-v0.95.0-osx-arm64/nwjs.app/Contents/Resources/app.nw
+
+      - name: Copy the source code into the NW.js folder
+        run: |
+          rsync -av --exclude=".git*" ./ ../nwjs-v0.72.0-osx-x64/nwjs.app/Contents/Resources/app.nw/
+          rsync -av --exclude=".git*" ./ ../nwjs-v0.95.0-osx-arm64/nwjs.app/Contents/Resources/app.nw/
+
+      - name: Rename nwjs.app to sparse-file-creator.app
+        run: |
+          mv ../nwjs-v0.72.0-osx-x64/nwjs.app ../nwjs-v0.72.0-osx-x64/sparse-file-creator.app
+          mv ../nwjs-v0.95.0-osx-arm64/nwjs.app ../nwjs-v0.95.0-osx-arm64/sparse-file-creator.app
+
+      - name: Rename folders
+        run: |
+          mv ../nwjs-v0.72.0-osx-x64 ../sparse-file-creator-osx-x64
+          mv ../nwjs-v0.95.0-osx-arm64 ../sparse-file-creator-osx-arm64
+            
+      - name: Compress folder to .zip files
+        run: |
+          zip -r ../sparse-file-creator-osx-x64.zip ../sparse-file-creator-osx-x64
+          zip -r ../sparse-file-creator-osx-arm64.zip ../sparse-file-creator-osx-arm64
+
+      - name: Upload the binaries
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: "$RELEASE_VERSION"
+        run: |
+          gh release upload "$RELEASE_VERSION" \
+          --repo="$GITHUB_REPOSITORY" \
+          "..\sparse-file-creator-osx-x64.zip" \
+          "..\sparse-file-creator-osx-arm64.zip"
+
+      - name: Cleaning up
+        run: |
+          rm ../nwjs-x64.zip
+          rm ../nwjs-arm64.zip
+          rm ../sparse-file-creator-osx-x64
+          rm ../sparse-file-creator-osx-arm64
+          rm ../sparse-file-creator-osx-x64.zip
+          rm ../sparse-file-creator-osx-arm64.zip
+
+  build-linux:
+    needs: create-release
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Install tools
+        run: sudo apt install -y zip unzip
+
+      - name: Download NW.js binaries
+        run: |
+          wget -O ../nwjs-ia32.tar.gz https://dl.nwjs.io/v0.72.0/nwjs-v0.72.0-linux-ia32.tar.gz
+          wget -O ../nwjs-x64.tar.gz https://dl.nwjs.io/v0.72.0/nwjs-v0.72.0-linux-x64.tar.gz
+
+      - name: Extract downloaded archives
+        run: |
+          tar -xzvf ../nwjs-ia32.tar.gz -C ../
+          tar -xzvf ../nwjs-x64.tar.gz -C ../
+
+      - name: Copy the source code into the NW.js folder
+        run: |
+          rsync -av --exclude=".git*" ./ ../nwjs-v0.72.0-linux-ia32/
+          rsync -av --exclude=".git*" ./ ../nwjs-v0.72.0-linux-x64/
+
+      - name: Rename nw to sparse-file-creator
+        run: |
+          mv ../nwjs-v0.72.0-linux-ia32/nw ../nwjs-v0.72.0-linux-ia32/sparse-file-creator
+          mv ../nwjs-v0.72.0-linux-x64/nw ../nwjs-v0.72.0-linux-x64/sparse-file-creator
+
+      - name: Rename folders
+        run: |
+          mv ../nwjs-v0.72.0-linux-ia32 ../sparse-file-creator-linux-ia32
+          mv ../nwjs-v0.72.0-linux-x64 ../sparse-file-creator-linux-x64
+            
+      - name: Compress folder to .tar.gz files
+        run: |
+          tar -czvf ../sparse-file-creator-linux-ia32.tar.gz ../sparse-file-creator-linux-ia32
+          tar -czvf ../sparse-file-creator-linux-x64.tar.gz ../sparse-file-creator-linux-x64
+
+      - name: Upload the binaries
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: "$RELEASE_VERSION"
+        run: |
+          gh release upload "$RELEASE_VERSION" \
+          --repo="$GITHUB_REPOSITORY" \
+          "..\sparse-file-creator-linux-ia32.tar.gz" \
+          "..\sparse-file-creator-linux-x64.tar.gz"
+
+      - name: Cleaning up
+        run: |
+          rm ../nwjs-ia32.tar.gz
+          rm ../nwjs-x64.tar.gz
+          rm ../sparse-file-creator-linux-ia32
+          rm ../sparse-file-creator-linux-x64
+          rm ../sparse-file-creator-linux-ia32.zip
+          rm ../sparse-file-creator-linux-x64.zip
+      
+    
